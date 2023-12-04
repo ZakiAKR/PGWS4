@@ -433,6 +433,41 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE LPSTR, int)
 	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
 	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
+	D3D12_DESCRIPTOR_RANGE descTbiRane = {};
+	descTbiRane.NumDescriptors = 1; //テクスチャ１つ
+	descTbiRane.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV; //種別はテクスチャー
+	descTbiRane.BaseShaderRegister = 0; //0番スロットから
+	descTbiRane.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	D3D12_STATIC_SAMPLER_DESC samplerDesc = {};
+	samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; //横方向の繰り返し
+	samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP; //縦方向の繰り返し
+	samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP; //奥行きの繰り返し
+	samplerDesc.BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK; //ボーダーは黒
+	samplerDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; //線形補間
+	samplerDesc.MaxLOD = D3D12_FLOAT32_MAX; //ミップマップ最大値
+	samplerDesc.MinLOD = 0.0f; //ミップマップ最小値
+	samplerDesc.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; //ピクセルシェーダーから見える
+	samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER; //リサンプリングしない
+
+	rootSignatureDesc.pStaticSamplers = &samplerDesc;
+	rootSignatureDesc.NumStaticSamplers = 1;
+
+	D3D12_ROOT_PARAMETER rootparam = {};
+	rootparam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	//ピクセルシェーダーから見える
+	rootparam.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	//ピクセルシェーダーから見える
+	rootparam.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	//ディスクリプタレンジのアドレス
+	rootparam.DescriptorTable.pDescriptorRanges = &descTbiRane;
+	//ディスクリプタレンジ数
+	rootparam.DescriptorTable.NumDescriptorRanges = 1;
+
+	rootSignatureDesc.pParameters = &rootparam; //ルートパラメーターの先頭アドレス
+	rootSignatureDesc.NumParameters = 1; //パラメーター数
+
+
 	ID3DBlob* rootSigBlob = nullptr;
 	result = D3D12SerializeRootSignature(
 		&rootSignatureDesc, //ルートシグネチャ設定
@@ -471,40 +506,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE LPSTR, int)
 	scissorrect.bottom = scissorrect.top + window_height; // 切り抜き下座標
 
 	UnregisterClass(w.lpszClassName, w.hInstance);
-
-	D3D12_DESCRIPTOR_RANGE descTbiRane;
-	descTbiRane.NumDescriptors = 1; //テクスチャ１つ
-	descTbiRane.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV; //種別はテクスチャー
-	descTbiRane.BaseShaderRegister = 0; //0番スロットから
-	descTbiRane.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-	D3D12_STATIC_SAMPLER_DESC samplerDesc = {};
-	samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; //横方向の繰り返し
-	samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP; //縦方向の繰り返し
-	samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP; //奥行きの繰り返し
-	samplerDesc.BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK; //ボーダーは黒
-	samplerDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; //線形補間
-	samplerDesc.MaxLOD = D3D12_FLOAT32_MAX; //ミップマップ最大値
-	samplerDesc.MinLOD = 0.0f; //ミップマップ最小値
-	samplerDesc.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; //ピクセルシェーダーから見える
-	samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER; //リサンプリングしない
-
-	rootSignatureDesc.pStaticSamplers = &samplerDesc;
-	rootSignatureDesc.NumStaticSamplers = 1;
-
-	D3D12_ROOT_PARAMETER rootparam = {};
-	rootparam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	//ピクセルシェーダーから見える
-	rootparam.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	//ピクセルシェーダーから見える
-	rootparam.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	//ディスクリプタレンジのアドレス
-	rootparam.DescriptorTable.pDescriptorRanges = &descTbiRane;
-	//ディスクリプタレンジ数
-	rootparam.DescriptorTable.NumDescriptorRanges = 1;
-
-	rootSignatureDesc.pParameters = &rootparam; //ルートパラメーターの先頭アドレス
-	rootSignatureDesc.NumParameters = 1; //パラメーター数
 
 	struct TexRGBA
 	{
