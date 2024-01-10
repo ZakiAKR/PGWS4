@@ -467,7 +467,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE LPSTR, int)
 	rootSignatureDesc.pParameters = &rootparam; //ルートパラメーターの先頭アドレス
 	rootSignatureDesc.NumParameters = 1; //パラメーター数
 
-
 	ID3DBlob* rootSigBlob = nullptr;
 	result = D3D12SerializeRootSignature(
 		&rootSignatureDesc, //ルートシグネチャ設定
